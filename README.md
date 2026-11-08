@@ -25,3 +25,11 @@ Sửa games.json (chỉ game bạn có quyền phân phối). Nếu nguồn khô
 
 ## Lưu tiến trình
 ROM đã thêm nằm trong IndexedDB (database `emuds`). Save state và lưu trong game dùng menu của EmulatorJS, tách theo từng game.
+
+## Tối ưu hiệu năng (60 FPS)
+- DS chạy tự nhiên ở khoảng 60 FPS; mục tiêu thực tế là giữ ổn định mức này, không phải cao hơn (cao hơn chỉ có khi tua nhanh, game sẽ chạy nhanh theo).
+- Khi đang chơi, trang tự tắt nền, lưới và hiệu ứng mờ để dành GPU cho game; shader mặc định tắt.
+- `_headers` bật cô lập trình duyệt (COOP + COEP credentialless). Khi đó trang tự bật đa luồng (`EJS_threads`) nếu trình duyệt hỗ trợ (Chrome, Edge, Firefox; Safari chưa hỗ trợ credentialless). Nếu sau khi bật mà EmulatorJS không tải được, xóa file `_headers`.
+- Nút FPS trên thanh trình chơi hiện số khung hình/giây của màn hình (độ mượt hiển thị). Tốc độ giả lập thật xem trong menu của EmulatorJS.
+- Mẹo: dùng Chrome/Edge, đóng tab khác, bật chế độ tiết kiệm pin = tắt, cắm sạc khi chơi trên điện thoại.
+
