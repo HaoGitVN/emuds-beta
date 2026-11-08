@@ -1,0 +1,15 @@
+{
+  "_doc": "Chỉ thêm game bạn có quyền phân phối (homebrew, game tác giả cho phép, bản của chính bạn). Mục không có romUrl sẽ tự ẩn.",
+  "games": [
+    {
+      "id": "vi-du-homebrew",
+      "title": "Tên game ví dụ",
+      "genre": "Giải đố",
+      "year": 2024,
+      "author": "Tên tác giả",
+      "license": "Tác giả cho phép phân phối tự do",
+      "source": "https://trang-cua-tac-gia.example/game",
+      "romUrl": ""
+    }
+  ]
+}

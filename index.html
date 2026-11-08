@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>EmuDS – Chơi DS trên trình duyệt</title>
+<style>
+:root{color-scheme:dark;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);--bg:#06050d;--bd:rgba(255,255,255,.1);--tx:#f3f1ff;--mut:#9b96b9;--c:#22e6ff;--m:#ff3cac;--v:#8b5cff}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*{box-sizing:border-box}
+body{margin:0;min-height:100vh;color:var(--tx);font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;padding-bottom:96px;background:radial-gradient(700px 420px at 90% -8%,rgba(255,60,172,.2),transparent 70%),radial-gradient(760px 520px at -10% 10%,rgba(34,230,255,.14),transparent 70%),var(--bg)}
+body::before{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;background-image:linear-gradient(rgba(139,92,255,.09) 1px,transparent 1px),linear-gradient(90deg,rgba(139,92,255,.09) 1px,transparent 1px);background-size:44px 44px;-webkit-mask-image:radial-gradient(ellipse at 50% 0,#000,transparent 72%);mask-image:radial-gradient(ellipse at 50% 0,#000,transparent 72%)}
+.wrap{max-width:1100px;margin:auto;padding:14px}
+.top{display:flex;align-items:center;gap:12px}
+.top svg{width:70px;height:auto;filter:drop-shadow(0 0 8px rgba(34,230,255,.5))}
+.top h1{margin:0;font-size:1.7rem;letter-spacing:2px;color:#fff}.top h1 b{color:var(--c)}
+.top p{margin:2px 0 0;color:var(--mut);font-size:.82rem}
+.hero{position:relative;margin-top:16px;padding:22px;border-radius:22px;border:1px solid transparent;overflow:hidden;background:linear-gradient(#0c0a1f,#0c0a1f) padding-box,linear-gradient(120deg,var(--c),var(--v),var(--m)) border-box}
+.hero::after{content:"";position:absolute;right:-60px;top:-60px;width:240px;height:240px;border-radius:50%;background:radial-gradient(circle,rgba(255,60,172,.35),transparent 70%)}
+.hero>*{position:relative;z-index:1}
+.ht{font-size:1.55rem;font-weight:800;line-height:1.2;margin:0 0 6px}
+.ht span{color:var(--c)}
+.hero p{margin:0 0 14px;color:var(--mut);max-width:440px;line-height:1.5}
+.hr{display:flex;align-items:center;gap:16px;flex-wrap:wrap}
+.stat{font-size:.8rem;color:var(--mut)}.stat b{display:block;font-size:1.6rem;color:#fff}
+.search{width:100%;margin-top:16px;padding:14px 18px;border:1px solid var(--bd);border-radius:14px;background:rgba(255,255,255,.05);color:var(--tx);font-size:1rem}
+.search:focus{outline:none;border-color:var(--c);box-shadow:0 0 0 3px rgba(34,230,255,.15)}
+.rail{display:flex;gap:6px;margin:12px 0 2px;overflow-x:auto;padding-bottom:6px}
+.l{flex:none;min-width:34px;border:1px solid var(--bd);background:transparent;color:var(--mut);padding:8px 12px;border-radius:10px;cursor:pointer;font-weight:700}
+.l.on{color:#06121a;background:var(--c);border-color:var(--c)}
+h2{margin:22px 0 12px;font-size:.78rem;letter-spacing:3px;text-transform:uppercase;color:var(--mut);display:flex;align-items:center;gap:10px}
+h2::after{content:"";flex:1;height:1px;background:linear-gradient(90deg,var(--bd),transparent)}
+.grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
+.card{position:relative;aspect-ratio:3/4;border-radius:18px;overflow:hidden;border:1px solid var(--bd);isolation:isolate;cursor:pointer;transition:transform .18s,box-shadow .18s,border-color .18s}
+.cov{position:absolute;inset:0;z-index:-1;background:radial-gradient(120% 80% at 20% 0,hsl(var(--h) 90% 60% / .85),transparent 60%),linear-gradient(160deg,hsl(var(--h) 80% 34%),hsl(calc(var(--h) + 70) 80% 12%))}
+.cov::before{content:"";position:absolute;inset:0;background:repeating-linear-gradient(0deg,rgba(0,0,0,.2) 0 1px,transparent 1px 4px)}
+.wm{position:absolute;right:-4px;top:14px;font-size:5.2rem;font-weight:900;line-height:1;letter-spacing:-4px;color:rgba(255,255,255,.15)}
+.tag{position:absolute;left:10px;top:10px;font-size:.6rem;font-weight:800;letter-spacing:1.5px;padding:4px 8px;border-radius:6px;background:rgba(0,0,0,.5);border:1px solid var(--bd)}
+.cap{position:absolute;left:0;right:0;bottom:0;padding:46px 62px 12px 12px;background:linear-gradient(transparent,rgba(5,4,14,.94))}
+.nm{font-weight:800;font-size:.92rem;line-height:1.2;word-break:break-word}
+.sz{color:var(--mut);font-size:.72rem;margin-top:3px}
+.go{position:absolute;right:10px;bottom:10px;width:44px;height:44px;border-radius:50%;border:0;background:var(--c);color:#04141b;font-size:1rem;cursor:pointer;box-shadow:0 0 16px rgba(34,230,255,.55)}
+.go:active{transform:scale(.94)}
+.m{position:absolute;right:8px;top:8px;border:0;background:rgba(0,0,0,.5);color:#fff;width:34px;height:34px;border-radius:50%;cursor:pointer}
+.add{display:grid;place-items:center;border:1.5px dashed rgba(139,92,255,.7);background:rgba(139,92,255,.05);color:var(--mut);text-align:center}
+.add big{display:block;font-size:2.6rem;color:var(--m);line-height:1;margin-bottom:6px}
+.page{display:none}.page.on{display:block}
+.panel{margin-top:16px;border:1px solid var(--bd);background:rgba(255,255,255,.04);border-radius:20px;padding:22px;line-height:1.65}
+.panel h3{margin:0 0 6px}.panel p{color:var(--mut)}
+.pick{display:inline-block;padding:13px 24px;border-radius:12px;font-weight:800;color:#fff;cursor:pointer;background:linear-gradient(90deg,var(--v),var(--m))}
+nav{position:fixed;left:10px;right:10px;bottom:calc(12px + env(safe-area-inset-bottom,0px));display:flex;gap:4px;padding:6px;border-radius:18px;border:1px solid var(--bd);background:rgba(12,10,28,.88);backdrop-filter:blur(14px);z-index:10}
+nav button{flex:1;border:0;background:none;color:var(--mut);padding:12px 8px;border-radius:13px;font-weight:700;font-size:.82rem;cursor:pointer}
+nav button.on{color:#fff;background:linear-gradient(90deg,rgba(139,92,255,.55),rgba(255,60,172,.45))}
+.player{position:fixed;inset:0;background:#000;z-index:30;display:none;flex-direction:column}
+.player.on{display:flex}
+.bar{display:flex;align-items:center;gap:8px;padding:calc(8px + env(safe-area-inset-top,0px)) 10px 8px;background:#0c0a1c;border-bottom:1px solid var(--bd)}
+.bar b{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.bar button{border:1px solid var(--m);background:transparent;color:var(--m);padding:8px 14px;border-radius:10px;cursor:pointer;font-weight:700}
+#stage{flex:1;min-height:0;position:relative}
+#game{width:100%;height:100%}
+.load{position:absolute;inset:0;display:grid;place-items:center;text-align:center;color:var(--mut);padding:20px;background:#000;z-index:2}
+.load.off{display:none}
+.toast{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(84px + env(safe-area-inset-bottom,0px));background:#1b1740;border:1px solid var(--c);padding:10px 18px;border-radius:12px;z-index:40;display:none;max-width:90%}
+@media (hover:hover){.card:hover{transform:translateY(-4px);border-color:var(--c);box-shadow:0 10px 30px rgba(34,230,255,.22)}}
+@media (min-width:900px){
+ body{padding-bottom:40px}
+ .top svg{width:96px}.top h1{font-size:2.2rem}
+ .hero{padding:34px 36px}.ht{font-size:2.3rem}
+ .search{max-width:520px;display:block}
+ .rail{flex-wrap:wrap;overflow:visible}
+ .grid{grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:18px}
+ nav{top:calc(20px + env(safe-area-inset-top,0px));bottom:auto;left:auto;right:max(16px,calc(50% - 534px))}
+ nav button{padding:10px 18px}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+ <div class="top">
+  <svg viewBox="0 0 120 100" role="img" aria-label="Logo EmuDS">
+   <defs><linearGradient id="g" x1="0" x2="1"><stop offset="0" stop-color="#22e6ff"/><stop offset="1" stop-color="#ff3cac"/></linearGradient></defs>
+   <g fill="rgba(255,255,255,.04)" stroke="url(#g)" stroke-width="3.5" stroke-linejoin="round"><rect x="14" y="4" width="92" height="43" rx="10"/><rect x="14" y="53" width="92" height="43" rx="10"/></g>
+   <rect x="28" y="12" width="64" height="27" rx="3" fill="#0a0818" stroke="#22e6ff" stroke-width="1.5"/>
+   <text x="60" y="31" text-anchor="middle" font-family="system-ui,sans-serif" font-weight="900" font-size="13" fill="#22e6ff">EmuDS</text>
+   <rect x="38" y="60" width="44" height="30" rx="3" fill="#0a0818" stroke="#ff3cac" stroke-width="1.5"/>
+   <path d="M20 74h14M27 67v14" stroke="#22e6ff" stroke-width="4" stroke-linecap="round"/>
+   <circle cx="96" cy="66" r="3.2" fill="#ff3cac"/><circle cx="90" cy="73" r="3.2" fill="#22e6ff"/><circle cx="102" cy="73" r="3.2" fill="#8b5cff"/><circle cx="96" cy="80" r="3.2" fill="#ffd84a"/>
+  </svg>
+  <div><h1>Emu<b>DS</b></h1><p>Thư viện DS của riêng bạn, chơi ngay trên trình duyệt</p></div>
+ </div>
+
+ <section class="page on" id="p-list">
+  <div class="hero">
+   <div class="ht">Kho game <span>DS</span> của riêng bạn</div>
+   <p>Nạp game của bạn một lần, chơi lại bất cứ lúc nào trên máy tính hoặc điện thoại.</p>
+   <div class="hr"><label class="pick" id="hadd">+ Thêm game</label><div class="stat"><b id="cnt">0</b>game trong thư viện</div></div>
+  </div>
+  <input class="search" id="q" type="search" placeholder="Tìm game…">
+  <div class="rail" id="rail"></div>
+  <h2 id="gt">Thư viện</h2>
+  <div class="grid" id="grid"></div>
+ </section>
+
+ <section class="page" id="p-add">
+  <div class="panel" style="text-align:center">
+   <h3>Thêm game vào thư viện</h3>
+   <p>Chọn file .nds hoặc .zip từ thiết bị. Game được lưu trong trình duyệt, lần sau chỉ cần bấm Chơi.</p>
+   <label class="pick">Chọn file ROM<input type="file" id="f" accept=".nds,.zip" multiple hidden></label>
+   <p>Chỉ dùng bản sao game bạn sở hữu hợp pháp. Trang này không cung cấp ROM thương mại.</p>
+  </div>
+ </section>
+
+ <section class="page" id="p-info">
+  <div class="panel">
+   <h3>Thông tin</h3>
+   <p>Điều khiển: trên máy tính dùng bàn phím hoặc tay cầm, trên điện thoại dùng phím ảo và chạm màn hình dưới như bút cảm ứng. Mở menu của trình giả lập để lưu và tải trạng thái game, đổi phím.</p>
+   <p>Tiến trình và thư viện nằm trong bộ nhớ trình duyệt của bạn. Xóa dữ liệu trình duyệt sẽ làm mất chúng.</p>
+  </div>
+ </section>
+</div>
+
+<nav>
+ <button data-p="p-list" class="on">Thư viện</button>
+ <button data-p="p-add">Thêm game</button>
+ <button data-p="p-info">Thông tin</button>
+</nav>
+
+<div class="player" id="pl">
+ <div class="bar"><b id="pn"></b><button id="fs">⛶ Toàn màn hình</button><button id="px">Thoát</button></div>
+ <div id="stage"><div class="load" id="ld">Đang chuẩn bị…</div><div id="game"></div></div>
+</div>
+<div class="toast" id="toast"></div>
+
+<script>
+/* ===== Cấu hình ===== */
+var EJS_PATH="https://cdn.emulatorjs.org/stable/data/"; // CDN chính thức của EmulatorJS; muốn tự host thì đổi thành "data/"
+var PROXY="";                  // ví dụ "https://emuds-proxy.ten.workers.dev/?url="; để trống nếu không dùng
+var CORE="nds";
+
+var DB=null,mem=[],user=[],cat=[],letter="",qs="",nextId=1;
+function $(i){return document.getElementById(i)}
+function toast(t){var e=$("toast");e.textContent=t;e.style.display="block";clearTimeout(toast.h);toast.h=setTimeout(function(){e.style.display="none"},3500)}
+
+/* IndexedDB cho ROM của người dùng */
+function openDB(){return new Promise(function(res){
+ try{var r=indexedDB.open("emuds",1);
+  r.onupgradeneeded=function(){r.result.createObjectStore("g",{keyPath:"id",autoIncrement:true})};
+  r.onsuccess=function(){DB=r.result;res()};r.onerror=function(){res()}}catch(e){res()}})}
+function all(){return new Promise(function(res){
+ if(!DB)return res(mem.slice());
+ try{var q=DB.transaction("g").objectStore("g").getAll();q.onsuccess=function(){res(q.result)};q.onerror=function(){res([])}}catch(e){res([])}})}
+function put(g){return new Promise(function(res){
+ if(!DB){g.id=nextId++;mem.push(g);return res()}
+ try{var t=DB.transaction("g","readwrite");t.objectStore("g").add(g);t.oncomplete=res;t.onerror=res}catch(e){res()}})}
+function del(id){return new Promise(function(res){
+ if(!DB){mem=mem.filter(function(g){return g.id!==id});return res()}
+ try{var t=DB.transaction("g","readwrite");t.objectStore("g").delete(id);t.oncomplete=res}catch(e){res()}})}
+
+function hue(s){var h=0;for(var i=0;i<s.length;i++)h=(h*31+s.charCodeAt(i))%360;return h}
+function ini(t){return (t.replace(/[^A-Za-z0-9 ]/g,"").split(" ").filter(Boolean).slice(0,2).map(function(w){return w[0]}).join("")||"DS").toUpperCase()}
+function mb(n){return (n/1048576).toFixed(1)+" MB"}
+function L(t){var c=t[0].toUpperCase();return /[A-Z]/.test(c)?c:"#"}
+
+function card(g){
+ var d=document.createElement("div");d.className="card";
+ d.innerHTML='<div class="cov" style="--h:'+hue(g.name)+'"><span class="wm">'+ini(g.name)+'</span></div><span class="tag">'+(g.remote?"MIỄN PHÍ":"NDS")+'</span><div class="cap"><div class="nm"></div><div class="sz"></div></div><button class="go" aria-label="Chơi">▶</button>';
+ d.querySelector(".nm").textContent=g.name;
+ d.querySelector(".sz").textContent=g.remote?(g.genre||"Game")+" · "+(g.year||""):mb(g.size);
+ d.onclick=function(){play(g)};
+ if(!g.remote){var m=document.createElement("button");m.className="m";m.textContent="⋮";
+  m.onclick=function(e){e.stopPropagation();var a=prompt("Gõ \"xoa\" để xóa game, hoặc nhập tên mới","");if(!a)return;
+   if(a==="xoa"){del(g.id).then(reload)}else{g.name=a;try{DB.transaction("g","readwrite").objectStore("g").put(g).transaction.oncomplete=reload}catch(x){render()}}};
+  d.appendChild(m)}
+ return d}
+
+function render(){
+ var R=$("rail");R.innerHTML="";
+ [""].concat("#ABCDEFGHIJKLMNOPQRSTUVWXYZ".split("")).forEach(function(c){var b=document.createElement("button");b.className="l"+(c===letter?" on":"");b.textContent=c||"Tất cả";b.onclick=function(){letter=c;render()};R.appendChild(b)});
+ var r=user.concat(cat).filter(function(g){return g.name.toLowerCase().indexOf(qs)>-1&&(!letter||L(g.name)===letter)});
+ r.sort(function(a,b){return a.name.localeCompare(b.name,"vi")});
+ var G=$("grid");G.innerHTML="";$("gt").textContent="Thư viện · "+r.length;$("cnt").textContent=user.length+cat.length;
+ var n=document.createElement("div");n.className="card add";n.innerHTML="<div><big>+</big>Thêm game</div>";n.onclick=function(){show("p-add")};G.appendChild(n);
+ r.forEach(function(g){G.appendChild(card(g))})}
+function reload(){all().then(function(a){user=a;render()})}
+
+/* games.json: chỉ nội dung được phép phân phối; mục không có romUrl bị ẩn */
+function loadCatalog(){fetch("games.json").then(function(r){return r.json()}).then(function(j){
+ cat=(j.games||[]).filter(function(g){return g.romUrl}).map(function(g){return{id:"c-"+g.id,name:g.title,genre:g.genre,year:g.year,romUrl:g.romUrl,remote:true}});render()}).catch(function(){})}
+
+$("f").onchange=function(e){
+ var gs=Array.from(e.target.files).map(function(f){return{name:f.name.replace(/\.[^.]+$/,""),size:f.size,added:Date.now(),blob:f}});
+ if(!gs.length)return;
+ Promise.all(gs.map(put)).then(function(){
+  reload();e.target.value="";
+  if(gs.length===1){play(gs[0])}   /* thêm 1 game: chơi luôn */
+  else{toast("Đã thêm "+gs.length+" game");show("p-list")}})};
+
+/* ===== Trình chơi ===== */
+function getRom(g){
+ if(!g.remote)return Promise.resolve(g.blob);
+ var url=PROXY?PROXY+encodeURIComponent(g.romUrl):g.romUrl;
+ return fetch(url).then(function(r){if(!r.ok)throw new Error("HTTP "+r.status);
+  var total=+r.headers.get("Content-Length")||0,got=0,parts=[],rd=r.body.getReader();
+  return (function pump(){return rd.read().then(function(x){
+   if(x.done)return new Blob(parts);
+   parts.push(x.value);got+=x.value.length;
+   if(total)$("ld").textContent="Đang tải game… "+Math.round(got/total*100)+"%";
+   return pump()})})()})}
+
+function play(g){
+ $("pn").textContent=g.name;$("pl").classList.add("on");
+ $("ld").className="load";$("ld").textContent="Đang chuẩn bị…";
+ getRom(g).then(function(blob){
+  var ext=(g.remote?g.romUrl:"x.nds").split("?")[0].split(".").pop().toLowerCase();
+  window.EJS_player="#game";window.EJS_core=CORE;window.EJS_pathtodata=EJS_PATH;
+  window.EJS_gameUrl=URL.createObjectURL(blob);
+  window.EJS_gameName=g.name.replace(/[^\w\- ]/g,"_"); /* khóa lưu tiến trình theo từng game */
+  window.EJS_startOnLoaded=true;window.EJS_color="#22e6ff";window.EJS_backgroundColor="#000";
+  window.EJS_onGameStart=function(){$("ld").className="load off"};
+  var s=document.createElement("script");s.src=EJS_PATH+"loader.js";
+  s.onerror=function(){$("ld").textContent="Không tải được EmulatorJS. Kiểm tra kết nối mạng hoặc đường dẫn EJS_PATH."};
+  document.body.appendChild(s)})
+ .catch(function(e){$("ld").textContent="Không tải được game ("+e.message+"). Kiểm tra romUrl, giấy phép nguồn và proxy."})}
+
+$("px").onclick=function(){location.reload()}; /* EmulatorJS chưa có API dọn sạch, tải lại là cách ổn định nhất */
+$("fs").onclick=function(){
+ var el=$("stage"),f=el.requestFullscreen||el.webkitRequestFullscreen;
+ if(f){Promise.resolve(f.call(el)).then(function(){
+  if(screen.orientation&&screen.orientation.lock&&matchMedia("(pointer:coarse)").matches)screen.orientation.lock("landscape").catch(function(){})}).catch(function(){})}};
+/* rung nhẹ khi chạm phím ảo (nếu thiết bị hỗ trợ) */
+$("game").addEventListener("touchstart",function(){if(navigator.vibrate)navigator.vibrate(8)},{passive:true});
+
+function show(id){document.querySelectorAll(".page").forEach(function(p){p.classList.toggle("on",p.id===id)});
+ document.querySelectorAll("nav button").forEach(function(b){b.classList.toggle("on",b.dataset.p===id)})}
+document.querySelectorAll("nav button").forEach(function(b){b.onclick=function(){show(b.dataset.p)}});
+$("q").oninput=function(e){qs=e.target.value.toLowerCase();render()};
+$("hadd").onclick=function(){show("p-add")};
+openDB().then(function(){reload();loadCatalog()});
+</script>
+</body>
+</html>
